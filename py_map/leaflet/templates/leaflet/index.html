@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block body %}
+<div class="row">
+    <div class="col">
+        <input type="checkbox" id="tms" value="true" onclick="tmsLayer = setLayer(tmsLayer, 'tms');">
+        <label for="tms">Show TMS</label>
+    </div>
+    <div class="col">
+        <input type="checkbox" id="wms" value="true" onclick="wmsLayer = setLayer(wmsLayer, 'wms');">
+        <label for="wms">Show WMS</label>
+    </div>
+</div>
+<div class="row flex-fill">
+    <div class="col d-flex flex-column">
+        <div id="map" class="h-100"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    var map;
+    function setMap() {
+        map = L.map('map').setView([45.464, 9.118], 7);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+    }
+    setMap();
+
+    var tmsLayer, wmsLayer;
+    function setLayer(layer, method) {
+        if (!layer) {
+            layer = L.tileLayer('{{ host }}' + method + '?z={z}&x={x}&y={y}', {
+                maxZoom: 19,
+                tms: method === 'wms',
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+        else {
+            map.removeLayer(layer);
+            layer = null;
+        }
+
+        return layer;
+    }
+</script>
+{% endblock %}
